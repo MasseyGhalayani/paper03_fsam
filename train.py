@@ -222,7 +222,8 @@ def main():
     # Define model
     # model = torch.nn.DataParallel(get_model(args))
     model = get_model(args)
-    model.cuda()
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.to(device)
 
     # for n, p in model.named_parameters():
     #     print (n, p.shape)
@@ -258,7 +259,7 @@ def main():
     print (len(train_loader.dataset))
 
     # define loss function (criterion) and optimizer
-    criterion = nn.CrossEntropyLoss().cuda()
+    criterion = nn.CrossEntropyLoss()
 
     if args.half:
         model.half()
@@ -352,8 +353,9 @@ def train(train_loader, model, criterion, optimizer, lr_scheduler, epoch):
         # measure data loading time
         data_time.update(time.time() - end)
 
-        target = target.cuda()
-        input_var = input.cuda()
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        target = target.to(device)
+        input_var = input.to(device)
         target_var = target
         if args.half:
             input_var = input_var.half()
@@ -435,9 +437,10 @@ def validate(val_loader, model, criterion):
     end = time.time()
     with torch.no_grad():
         for i, (input, target) in enumerate(val_loader):
-            target = target.cuda()
-            input_var = input.cuda()
-            target_var = target.cuda()
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            target = target.to(device)
+            input_var = input.to(device)
+            target_var = target.to(device)
 
             if args.half:
                 input_var = input_var.half()
