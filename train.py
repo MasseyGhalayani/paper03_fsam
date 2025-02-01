@@ -135,32 +135,6 @@ p0 = None
 
 args = parser.parse_args()
 
-# Step 3: Override only specific arguments
-override_args = {
-    "device": 0,
-    "arch": "resnet18",
-    "randomseed": 1,
-    "datasets": "CIFAR10",
-    "schedule": "cosine",
-    "weight_decay": 0.001,
-    "epochs": 200,
-    "rho": 0.2,
-    "sigma": 1,
-    "lmbda": 0.6,
-    "optimizer": "FriendlySAM",
-    "lr": 0.05,
-    "cutout": True,
-    "print_freq": 200,
-}
-
-# Step 4: Update only the specified keys
-vars(args).update(override_args)
-
-# Step 5: Print the final arguments
-print("Final Arguments:")
-for key, value in vars(args).items():
-    print(f"{key}: {value}")
-
 if args.wandb:
     import wandb
 
@@ -252,7 +226,11 @@ def main():
     # Define model
     # model = torch.nn.DataParallel(get_model(args))
     model = get_model(args)
+    if torch.cuda.device_count() > 1:
+        print("Using", torch.cuda.device_count(), "GPUs")
+        model = torch.nn.DataParallel(model)
     model.cuda()
+
 
     # for n, p in model.named_parameters():
     #     print (n, p.shape)
