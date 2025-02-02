@@ -328,7 +328,7 @@ def main():
         save_checkpoint({
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
-        }, is_best, filename=os.path.join(args.save_dir, 'model.th'))
+        }, is_best, filename=os.path.join(args.save_dir, f'model_{args.noise_ratio}.th'))
 
     print('train loss: ', train_loss)
     print('train err: ', train_err)
