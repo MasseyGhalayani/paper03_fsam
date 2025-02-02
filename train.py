@@ -248,7 +248,8 @@ def main():
             if "epoch" in checkpoint.keys():
                 args.start_epoch = checkpoint['epoch'] + 1
             else:
-                args.start_epoch = 100
+                args.start_epoch = 0
+                checkpoint['epoch'] = args.start_epoch
             print('from ', args.start_epoch)
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
