@@ -238,8 +238,8 @@ def main():
 
     # Optionally resume from a checkpoint
     if args.resume:
-        # if os.path.isfile(args.resume):
-        if os.path.isfile(os.path.join(args.save_dir, args.resume)):
+        if os.path.isfile(args.resume):
+        # if os.path.isfile(os.path.join(args.save_dir, args.resume)):
 
             # model.load_state_dict(torch.load(os.path.join(args.save_dir, args.resume)))
 
