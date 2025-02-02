@@ -334,6 +334,7 @@ def main():
             'best_prec1': best_prec1,
             'epoch': epoch
         }, is_best, filename=os.path.join(args.save_dir, f'model_{args.noise_ratio}.th'))
+        print(f'best_prec1: {best_prec1}')
 
     print('train loss: ', train_loss)
     print('train err: ', train_err)
