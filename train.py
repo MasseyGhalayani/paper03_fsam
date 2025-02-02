@@ -245,7 +245,7 @@ def main():
 
             print("=> loading checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
-            if checkpoint['epoch']:
+            if "epoch" in checkpoint.keys():
                 args.start_epoch = checkpoint['epoch'] + 1
             else:
                 args.start_epoch = 100
