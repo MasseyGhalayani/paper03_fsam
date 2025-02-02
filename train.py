@@ -245,7 +245,10 @@ def main():
 
             print("=> loading checkpoint '{}'".format(args.resume))
             checkpoint = torch.load(args.resume)
-            args.start_epoch = checkpoint['epoch']
+            if checkpoint['epoch']:
+                args.start_epoch = checkpoint['epoch'] + 1
+            else:
+                args.start_epoch = 100
             print('from ', args.start_epoch)
             best_prec1 = checkpoint['best_prec1']
             model.load_state_dict(checkpoint['state_dict'])
@@ -328,6 +331,7 @@ def main():
         save_checkpoint({
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
+            'epoch': epoch
         }, is_best, filename=os.path.join(args.save_dir, f'model_{args.noise_ratio}.th'))
 
     print('train loss: ', train_loss)
