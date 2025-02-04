@@ -380,7 +380,7 @@ def train(train_loader, model, criterion, optimizer, lr_scheduler, epoch):
             input_var = input_var.half()
 
         if hasattr(optimizer, "first_step") and hasattr(optimizer, "second_step"):
-            # ----- SAM-style training (FriendlySAM, etc.) -----
+            # SAM / FriendlySAM two-step
             enable_running_stats(model)
             predictions = model(input_var)
             loss = criterion(predictions, target_var)
@@ -393,28 +393,33 @@ def train(train_loader, model, criterion, optimizer, lr_scheduler, epoch):
             loss_adv.backward()
             optimizer.second_step(zero_grad=True)
 
+            # Record normal loss stats
+            total_loss += loss.item() * input_var.size(0)
+            total_err += (predictions.argmax(dim=1) != target_var).sum().item()
+
+            # Record "adv" stats
+            ori_total_loss += loss_adv.item() * input_var.size(0)
+            ori_total_err += (output_adv.argmax(dim=1) != target_var).sum().item()
+
         else:
-            # ----- Standard single-step training (SGD, Adam, ...) -----
+            # Standard SGD
             optimizer.zero_grad()
             predictions = model(input_var)
             loss = criterion(predictions, target_var)
             loss.backward()
             optimizer.step()
 
+            # Record normal loss stats
+            total_loss += loss.item() * input_var.size(0)
+            total_err += (predictions.argmax(dim=1) != target_var).sum().item()
+
+
+            ori_total_loss += loss.item() * input_var.size(0)
+            ori_total_err += (predictions.argmax(dim=1) != target_var).sum().item()
+
+
         lr_scheduler.step()
 
-        output = predictions.float()
-        loss = loss.float()
-
-        total_loss += loss.item() * input_var.shape[0]
-        total_err += (output.max(dim=1)[1] != target_var).sum().item()
-
-        # measure accuracy and record loss
-        prec1 = accuracy(output.data, target)[0]
-        losses.update(loss.item(), input.size(0))
-        top1.update(prec1.item(), input.size(0))
-
-        # measure elapsed time
         batch_time.update(time.time() - end)
         end = time.time()
 
