@@ -287,6 +287,9 @@ def main():
         base_optimizer = torch.optim.AdamW
         optimizer = SAM(model.parameters(), base_optimizer, rho=args.rho, adaptive=0, lr=args.lr,
                         weight_decay=args.weight_decay)
+
+    elif args.optimizer == 'SGD':
+        optimizer = torch.optim.SGD
     elif args.optimizer == 'FriendlySAM':
         base_optimizer = torch.optim.SGD
         optimizer = FriendlySAM(model.parameters(), base_optimizer, rho=args.rho, sigma=args.sigma, lmbda=args.lmbda,
