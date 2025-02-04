@@ -423,8 +423,6 @@ def train(train_loader, model, criterion, optimizer, lr_scheduler, epoch):
         batch_time.update(time.time() - end)
         end = time.time()
 
-        ori_total_loss += loss_adv.item() * input_var.shape[0]
-        ori_total_err += (output_adv.max(dim=1)[1] != target_var).sum().item()
 
         if i % args.print_freq == 0 or i == len(train_loader) - 1:
             print('Epoch: [{0}][{1}/{2}]\t'
