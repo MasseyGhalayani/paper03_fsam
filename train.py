@@ -379,20 +379,27 @@ def train(train_loader, model, criterion, optimizer, lr_scheduler, epoch):
         if args.half:
             input_var = input_var.half()
 
-        enable_running_stats(model)
+        if hasattr(optimizer, "first_step") and hasattr(optimizer, "second_step"):
+            # ----- SAM-style training (FriendlySAM, etc.) -----
+            enable_running_stats(model)
+            predictions = model(input_var)
+            loss = criterion(predictions, target_var)
+            loss.backward()
+            optimizer.first_step(zero_grad=True)
 
-        # first forward-backward step
-        predictions = model(input_var)
-        loss = criterion(predictions, target_var)
-        loss.mean().backward()
-        optimizer.first_step(zero_grad=True)
+            disable_running_stats(model)
+            output_adv = model(input_var)
+            loss_adv = criterion(output_adv, target_var)
+            loss_adv.backward()
+            optimizer.second_step(zero_grad=True)
 
-        # second forward-backward step
-        disable_running_stats(model)
-        output_adv = model(input_var)
-        loss_adv = criterion(output_adv, target_var)
-        loss_adv.mean().backward()
-        optimizer.second_step(zero_grad=True)
+        else:
+            # ----- Standard single-step training (SGD, Adam, ...) -----
+            optimizer.zero_grad()
+            predictions = model(input_var)
+            loss = criterion(predictions, target_var)
+            loss.backward()
+            optimizer.step()
 
         lr_scheduler.step()
 
