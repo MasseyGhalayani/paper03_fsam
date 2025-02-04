@@ -289,7 +289,7 @@ def main():
                         weight_decay=args.weight_decay)
 
     elif args.optimizer == 'SGD':
-        optimizer = torch.optim.SGD(model.parameters() ,momentum=args.momentum,weight_decay=args.weight_decay)
+        optimizer = torch.optim.SGD(model.parameters() ,momentum=args.momentum,weight_decay=args.weight_decay,lr=args.lr)
     elif args.optimizer == 'FriendlySAM':
         base_optimizer = torch.optim.SGD
         optimizer = FriendlySAM(model.parameters(), base_optimizer, rho=args.rho, sigma=args.sigma, lmbda=args.lmbda,
