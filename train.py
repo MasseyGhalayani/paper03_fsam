@@ -420,6 +420,14 @@ def train(train_loader, model, criterion, optimizer, lr_scheduler, epoch):
 
         lr_scheduler.step()
 
+        output = predictions.float()
+        loss = loss.float()
+
+        # measure accuracy and record loss
+        prec1 = accuracy(output.data, target)[0]
+        losses.update(loss.item(), input.size(0))
+        top1.update(prec1.item(), input.size(0))
+
         batch_time.update(time.time() - end)
         end = time.time()
 
